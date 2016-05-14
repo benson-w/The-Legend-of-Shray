@@ -2,4 +2,4 @@
 
 -------
 
-![image](shray1.jpg)
+![ScreenShot](shray1.jpg)
