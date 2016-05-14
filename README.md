@@ -2,4 +2,4 @@
 
 -------
 
-![ScreenShot](shray1.jpg)
+![](shray1.jpg = 300x)
