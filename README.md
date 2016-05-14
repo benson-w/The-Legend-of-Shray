@@ -2,4 +2,4 @@
 
 -------
 
-![alt tag](shray1.jpg)
+![image](shray1.jpg)
