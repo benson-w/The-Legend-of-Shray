@@ -1,21 +1,14 @@
 """
-Sample Python/Pygame Programs
-Simpson College Computer Science
-http://programarcadegames.com/
-http://simpson.edu/computer-science/
 
-From:
-http://programarcadegames.com/python_examples/f.php?file=platform_jumper.py
+THE LEGEND OF SHRAY
 
-Explanation video: http://youtu.be/BCxWJgN4Nnc
+|======================|
+|                      |
+|        "ok"          |
+|                      |
+|======================|
 
-Part of a series:
-http://programarcadegames.com/python_examples/f.php?file=move_with_walls_example.py
-http://programarcadegames.com/python_examples/f.php?file=maze_runner.py
-http://programarcadegames.com/python_examples/f.php?file=platform_jumper.py
-http://programarcadegames.com/python_examples/f.php?file=platform_scroller.py
-http://programarcadegames.com/python_examples/f.php?file=platform_moving.py
-http://programarcadegames.com/python_examples/sprite_sheets/
+built upon: http://programarcadegames.com/python_examples/f.php?file=platform_jumper.py
 """
 
 import pygame
@@ -102,7 +95,7 @@ class Player(pygame.sprite.Sprite):
         if self.change_y == 0:
             self.change_y = 1
         else:
-            self.change_y += .35
+            self.change_y += .7 #higher value = less moon-like, smash effect
 
         # See if we are on the ground.
         if self.rect.y >= SCREEN_HEIGHT - self.rect.height and self.change_y >= 0:
@@ -195,9 +188,7 @@ class Level_01(Level):
         Level.__init__(self, player)
 
         # Array with width, height, x, and y of platform
-        level = [[210, 70, 500, 500],
-                 [210, 70, 200, 400],
-                 [210, 70, 600, 300],
+        level = [[600, 40, 100, 500]
                  ]
 
         # Go through the array above and add platforms
@@ -234,7 +225,7 @@ def main():
     player.level = current_level
 
     player.rect.x = 340
-    player.rect.y = SCREEN_HEIGHT - player.rect.height
+    player.rect.y = SCREEN_HEIGHT - player.rect.height - 200
     active_sprite_list.add(player)
 
     # Loop until the user clicks the close button.
