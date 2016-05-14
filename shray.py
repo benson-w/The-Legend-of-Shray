@@ -18,9 +18,9 @@ import pygame
 # Colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-GREEN = (0, 255, 0)
-RED = (255, 0, 0)
-BLUE = (0, 0, 255)
+GREEN = (112, 128, 144)
+RED = (255, 218, 185)
+BLUE = (135, 206, 250)
 
 # Screen dimensions
 SCREEN_WIDTH = 800
@@ -28,10 +28,7 @@ SCREEN_HEIGHT = 600
 
 
 class Player(pygame.sprite.Sprite):
-    """ This class represents the bar at the bottom that the player
-        controls. """
 
-    # -- Methods
     def __init__(self):
         """ Constructor function """
 
@@ -51,6 +48,9 @@ class Player(pygame.sprite.Sprite):
         # Set speed vector of player
         self.change_x = 0
         self.change_y = 0
+
+        # Set initial health/percentage
+        self.percentage = 0
 
         # List of sprites we can bump against
         self.level = None
@@ -132,6 +132,11 @@ class Player(pygame.sprite.Sprite):
         """ Called when the user lets off the keyboard. """
         self.change_x = 0
 
+    #health
+    def get_percentage(self):
+        #update percentage when hit by something
+        self.percentage = 0
+
 
 class Platform(pygame.sprite.Sprite):
     """ Platform the user can jump on """
@@ -173,7 +178,7 @@ class Level(object):
         """ Draw everything on this level. """
 
         # Draw the background
-        screen.fill(BLUE)
+        #screen.fill(BLUE)
 
         # Draw all the sprite lists that we have
         self.platform_list.draw(screen)
@@ -231,11 +236,12 @@ def main():
     player.rect.y = SCREEN_HEIGHT - player.rect.height - 200
     active_sprite_list.add(player)
 
-    # Loop until the user clicks the close button.
     done = False
-
     # Used to manage how fast the screen updates
     clock = pygame.time.Clock()
+
+    #initialize text display
+    font = pygame.font.Font('freesansbold.ttf',30)
 
     # -------- Main Program Loop -----------
     while not done:
@@ -243,22 +249,39 @@ def main():
             if event.type == pygame.QUIT:
                 done = True
 
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    player.go_left()
-                if event.key == pygame.K_RIGHT:
-                    player.go_right()
-                if event.key == pygame.K_UP:
-                    player.jump()
+            #only allow key presses if on the ground
+            player.rect.y += 2
+            platform_hit_list = pygame.sprite.spritecollide(player, player.level.platform_list, False)
+            player.rect.y -= 2
+            if len(platform_hit_list) > 0:
 
-            if event.type == pygame.KEYUP:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_LEFT:
+                        player.go_left()
+                    if event.key == pygame.K_RIGHT:
+                        player.go_right()
+                    if event.key == pygame.K_UP:
+                        player.jump()
+
+            #stop moving if you stop holding
+            if event.type == pygame.KEYUP and len(platform_hit_list) > 0:
                 if event.key == pygame.K_LEFT and player.change_x < 0:
                     player.stop()
                 if event.key == pygame.K_RIGHT and player.change_x > 0:
                     player.stop()
 
+            # stop moving if you're coliding with something (ground)
+            # and you're not pressing anything
+            if (len(platform_hit_list) > 0) and (event.type != pygame.KEYDOWN):
+                player.stop()
+
         # Update the player.
         active_sprite_list.update()
+
+        # Update percentage
+        display_percent = font.render("Percentage: " + str(player.get_percentage()), True, (0, 0, 0))
+        screen.fill(BLUE)
+        screen.blit(display_percent, (10, 10))
 
         # Update items in the level
         current_level.update()
@@ -272,14 +295,13 @@ def main():
             player.rect.left = 0
 
         # ALL CODE TO DRAW SHOULD GO BELOW THIS COMMENT
+
         current_level.draw(screen)
         active_sprite_list.draw(screen)
 
         # ALL CODE TO DRAW SHOULD GO ABOVE THIS COMMENT
-
         # Limit to 60 frames per second
         clock.tick(60)
-
         # Go ahead and update the screen with what we've drawn.
         pygame.display.flip()
 
