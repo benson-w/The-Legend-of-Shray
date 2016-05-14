@@ -97,10 +97,13 @@ class Player(pygame.sprite.Sprite):
         else:
             self.change_y += .7 #higher value = less moon-like, smash effect
 
-        # See if we are on the ground.
+        # update position when hit the ground
         if self.rect.y >= SCREEN_HEIGHT - self.rect.height and self.change_y >= 0:
-            self.change_y = 0
-            self.rect.y = SCREEN_HEIGHT - self.rect.height
+            self.rect.x = 340
+            self.rect.y = SCREEN_HEIGHT - self.rect.height - 200
+
+        #    self.change_y = 0
+        #    self.rect.y = SCREEN_HEIGHT - self.rect.height
 
     def jump(self):
         """ Called when user hits 'jump' button. """
@@ -208,7 +211,7 @@ def main():
     size = [SCREEN_WIDTH, SCREEN_HEIGHT]
     screen = pygame.display.set_mode(size)
 
-    pygame.display.set_caption("Platformer Jumper")
+    pygame.display.set_caption("The Legend of Shray")
 
     # Create the player
     player = Player()
