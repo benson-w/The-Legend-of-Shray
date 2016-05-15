@@ -2,6 +2,16 @@
 
 ---
 
+**Dependencies:**
+* python3+
+* pygame
+
+**Controls:**
+* arrow keys for movement
+* esc to reset
+
+---
+
 **To Do:**
 * work on animations
 * add enemies
