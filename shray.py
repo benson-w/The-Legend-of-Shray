@@ -8,8 +8,7 @@ THE LEGEND OF SHRAY
 |                      |
 |======================|
 
-built upon: http://programarcadegames.com/python_examples/f.php?file=platform_jumper.py
-"""
+built upon: http://programarcadegames.com/python_examples/f.php?file=platform_jumper.py"""
 
 import pygame
 
@@ -48,6 +47,7 @@ class Player(pygame.sprite.Sprite):
         # Set speed vector of player
         self.change_x = 0
         self.change_y = 0
+        self.accel_x = 0
 
         # Set initial health/percentage
         self.percentage = 0
@@ -62,6 +62,7 @@ class Player(pygame.sprite.Sprite):
 
         # Move left/right
         self.rect.x += self.change_x
+        self.change_x = self.change_x + self.accel_x
 
         # See if we hit anything
         block_hit_list = pygame.sprite.spritecollide(self, self.level.platform_list, False)
@@ -95,7 +96,7 @@ class Player(pygame.sprite.Sprite):
         if self.change_y == 0:
             self.change_y = 1
         else:
-            self.change_y += .7 #higher value = less moon-like, smash effect
+            self.change_y += 1.0  #grav
 
         # update position when hit the ground
         if self.rect.y >= SCREEN_HEIGHT - self.rect.height and self.change_y >= 0:
@@ -122,15 +123,25 @@ class Player(pygame.sprite.Sprite):
     # Player-controlled movement:
     def go_left(self):
         """ Called when the user hits the left arrow. """
-        self.change_x = -6
+
+        if self.change_x < -4:
+            self.accel_x = 0
+            self.change_x = -4
+        else:
+            self.accel_x = -1
 
     def go_right(self):
         """ Called when the user hits the right arrow. """
-        self.change_x = 6
+        if self.change_x > 4:
+            self.accel_x = 0
+            self.change_x = 4
+        else:
+            self.accel_x = 1
 
     def stop(self):
         """ Called when the user lets off the keyboard. """
         self.change_x = 0
+        self.accel_x = 0
 
     #health
     def get_percentage(self):
@@ -168,6 +179,10 @@ class Level(object):
         # Background image
         self.background = None
 
+        # How far this world has been scrolled left/right
+        self.world_shift = 0
+        self.level_limit = -1000
+
     # Update everythign on this level
     def update(self):
         """ Update everything in this level."""
@@ -184,6 +199,19 @@ class Level(object):
         self.platform_list.draw(screen)
         self.enemy_list.draw(screen)
 
+    def shift_world(self, shift_x):
+        """ When the user moves left/right and we need to scroll everything:"""
+
+        # Keep track of the shift amount
+        self.world_shift += shift_x
+
+        # Go through all the sprite lists and shift
+        for platform in self.platform_list:
+            platform.rect.x += shift_x
+
+        for enemy in self.enemy_list:
+            enemy.rect.x += shift_x
+
 
 # Create platforms for the level
 class Level_01(Level):
@@ -195,9 +223,11 @@ class Level_01(Level):
         # Call the parent constructor
         Level.__init__(self, player)
 
+        self.level_limit = -1500
+
         # Array with width, height, x, and y of platform
-        level = [[600, 40, 100, 500]
-                 ]
+        level = [[600, 40, 100, 500],
+                 [600, 40, 700, 480]]
 
         # Go through the array above and add platforms
         for platform in level:
@@ -210,6 +240,7 @@ class Level_01(Level):
 
 def main():
     """ Main Program """
+
     pygame.init()
 
     # Set the height and width of the screen
@@ -249,19 +280,24 @@ def main():
             if event.type == pygame.QUIT:
                 done = True
 
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE: #exit the game
+                    done = True
+                if event.key == pygame.K_1:
+                    player.rect.x = 340 #need argument with diff (frame shift) for reset
+                    player.rect.y = SCREEN_HEIGHT - player.rect.height - 200
+
             #only allow key presses if on the ground
             player.rect.y += 2
             platform_hit_list = pygame.sprite.spritecollide(player, player.level.platform_list, False)
             player.rect.y -= 2
-            if len(platform_hit_list) > 0:
-
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_LEFT:
-                        player.go_left()
-                    if event.key == pygame.K_RIGHT:
-                        player.go_right()
-                    if event.key == pygame.K_UP:
-                        player.jump()
+            if (len(platform_hit_list) > 0) and (event.type == pygame.KEYDOWN):
+                if event.key == pygame.K_LEFT:
+                    player.go_left()
+                if event.key == pygame.K_RIGHT:
+                    player.go_right()
+                if event.key == pygame.K_UP:
+                    player.jump()
 
             #stop moving if you stop holding
             if event.type == pygame.KEYUP and len(platform_hit_list) > 0:
@@ -272,7 +308,7 @@ def main():
 
             # stop moving if you're coliding with something (ground)
             # and you're not pressing anything
-            if (len(platform_hit_list) > 0) and (event.type != pygame.KEYDOWN):
+            if (len(platform_hit_list) > 0) and (event.type == pygame.KEYUP):
                 player.stop()
 
         # Update the player.
@@ -287,12 +323,22 @@ def main():
         current_level.update()
 
         # If the player gets near the right side, shift the world left (-x)
-        if player.rect.right > SCREEN_WIDTH:
-            player.rect.right = SCREEN_WIDTH
+        if player.rect.right >= 500:
+            diff = player.rect.right - 500
+            player.rect.right = 500
+            current_level.shift_world(-diff)
 
         # If the player gets near the left side, shift the world right (+x)
-        if player.rect.left < 0:
-            player.rect.left = 0
+        if player.rect.left <= 120:
+            diff = 120 - player.rect.left
+            player.rect.left = 120
+            current_level.shift_world(diff)
+
+
+        ''' Code for end of level
+         http://programarcadegames.com/python_examples/show_file.php?file=platform_moving.py
+         around line 425
+         '''
 
         # ALL CODE TO DRAW SHOULD GO BELOW THIS COMMENT
 
@@ -302,6 +348,9 @@ def main():
         # ALL CODE TO DRAW SHOULD GO ABOVE THIS COMMENT
         # Limit to 60 frames per second
         clock.tick(60)
+
+        # ! Change screen by shifting everything in screen
+
         # Go ahead and update the screen with what we've drawn.
         pygame.display.flip()
 

@@ -1,9 +1,13 @@
-# The-Legend-of-Shray
+# The Legend of Shray
 
--------
+---
 
 **To Do:**
-*add acceleration component (update self.change_x/y)
-*prevent left/right movement by keys in midair, fix: movement glitch after landing
-*work on animations
-*make player2
+* work on animations
+* add enemies
+* add visuals
+* add player functions, weapons, etc
+
+**Bugs:**
+* movement glitch after jump with x component
+* acceleration glitch
