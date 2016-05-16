@@ -126,19 +126,19 @@ class Player(pygame.sprite.Sprite):
     def go_left(self):
         """ Called when the user hits the left arrow. """
 
-        if self.change_x < -4:
+        if self.change_x <= -5:
             self.accel_x = 0
-            self.change_x = -4
+            self.change_x = -5
         else:
-            self.accel_x = -1
+            self.accel_x = -.5
 
     def go_right(self):
         """ Called when the user hits the right arrow. """
-        if self.change_x > 4:
+        if self.change_x >= 5:
             self.accel_x = 0
-            self.change_x = 4
+            self.change_x = 5
         else:
-            self.accel_x = 1
+            self.accel_x = .5
 
     def stop(self):
         """ Called when the user lets off the keyboard. """
@@ -294,18 +294,18 @@ def main():
             platform_hit_list = pygame.sprite.spritecollide(player, player.level.platform_list, False)
             player.rect.y -= 2
             if (len(platform_hit_list) > 0) and (event.type == pygame.KEYDOWN):
-                if event.key == pygame.K_LEFT:
+                if event.key == pygame.K_LEFT or event.key == pygame.K_a:
                     player.go_left()
-                if event.key == pygame.K_RIGHT:
+                if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                     player.go_right()
-                if event.key == pygame.K_UP:
+                if event.key == pygame.K_UP or event.key == pygame.K_w:
                     player.jump()
 
             #stop moving if you stop holding
             if event.type == pygame.KEYUP and len(platform_hit_list) > 0:
-                if event.key == pygame.K_LEFT and player.change_x < 0:
+                if (event.key == pygame.K_LEFT or event.key == pygame.K_a) and player.change_x < 0:
                     player.stop()
-                if event.key == pygame.K_RIGHT and player.change_x > 0:
+                if (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and player.change_x > 0:
                     player.stop()
 
             # stop moving if you're coliding with something (ground)
