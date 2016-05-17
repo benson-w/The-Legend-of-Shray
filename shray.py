@@ -11,10 +11,15 @@ THE LEGEND OF SHRAY
 built upon: http://programarcadegames.com/python_examples/f.php?file=platform_jumper.py"""
 
 import pygame
+import math
 
 # Global constants
-
-# Colors
+'''
+#doesn't match to actual colors
+Red is color of character
+Blue is color of background
+Green is color of blocks
+'''
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GREEN = (112, 128, 144)
@@ -25,6 +30,54 @@ BLUE = (135, 206, 250)
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
+
+class Bullet(pygame.sprite.Sprite):
+
+    def __init__(self, mouse, player):
+        super().__init__()
+        self.image = pygame.Surface([10, 10])
+        self.image.fill(BLACK)
+
+        self.mouse_x, self.mouse_y = mouse[0], mouse[1]
+        self.player = player
+
+        self.rect = self.image.get_rect()
+
+        self.rect.x = player[0]
+        self.rect.y = player[1]
+
+    def update(self):
+
+        speed = 30
+        #range = 200
+        distance = [self.mouse_x - self.player[0], self.mouse_y - self.player[1]]
+        norm = math.sqrt(distance[0] ** 2 + distance[1] ** 2)
+        direction = [distance[0] / norm, distance[1 ] / norm]
+        bullet_vector = [direction[0] * speed, direction[1] * speed]
+
+
+        self.rect.x += bullet_vector[0]
+        self.rect.y += bullet_vector[1]
+
+        #unadded: destroy upon collision or exceed range
+
+class Crosshair(pygame.sprite.Sprite):
+
+    #Crosshair constructor
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.Surface([5, 5])
+        self.image.fill(BLACK)
+        self.image.set_alpha(100) #0 is fully transparent, #255 opaque
+
+        # Set a reference as image rect
+        self.rect = self.image.get_rect()
+
+    '''def update(self, mouse):
+        # Move the crosshair
+        self.rect.x = pygame.mouse.get_pos()[0]
+        self.rect.y = pygame.mouse.get_pos()[1]
+    '''
 
 class Player(pygame.sprite.Sprite):
 
@@ -126,19 +179,19 @@ class Player(pygame.sprite.Sprite):
     def go_left(self):
         """ Called when the user hits the left arrow. """
 
-        if self.change_x <= -5:
+        if self.change_x <= -4:
             self.accel_x = 0
-            self.change_x = -5
+            self.change_x = -4
         else:
-            self.accel_x = -.5
+            self.accel_x = -1
 
     def go_right(self):
         """ Called when the user hits the right arrow. """
-        if self.change_x >= 5:
+        if self.change_x >= 4:
             self.accel_x = 0
-            self.change_x = 5
+            self.change_x = 4
         else:
-            self.accel_x = .5
+            self.accel_x = 1
 
     def stop(self):
         """ Called when the user lets off the keyboard. """
@@ -254,6 +307,12 @@ def main():
     # Create the player
     player = Player()
 
+    # Create the crosshair
+    crosshair = Crosshair()
+
+    # Remove mouse icon
+    pygame.mouse.set_visible(False)
+
     # Create all the levels
     level_list = []
     level_list.append( Level_01(player) )
@@ -268,16 +327,22 @@ def main():
     player.rect.x = 340
     player.rect.y = SCREEN_HEIGHT - player.rect.height - 200
     active_sprite_list.add(player)
+    active_sprite_list.add(crosshair)
 
     done = False
     # Used to manage how fast the screen updates
     clock = pygame.time.Clock()
 
     #initialize text display
-    font = pygame.font.Font('freesansbold.ttf',30)
+    font = pygame.font.Font('freesansbold.ttf',24)
 
     # -------- Main Program Loop -----------
     while not done:
+
+        #Update crosshair position (Crosshair.update is broken; not sure what arguments to pass)
+        crosshair.rect.x = pygame.mouse.get_pos()[0]
+        crosshair.rect.y = pygame.mouse.get_pos()[1]
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 done = True
@@ -286,14 +351,21 @@ def main():
                 if event.key == pygame.K_ESCAPE: #exit the game
                     done = True
                 if event.key == pygame.K_1:
-                    player.rect.x = 340 #need argument with diff (frame shift) for reset
+                    player.rect.x = 340 + player.level.world_shift #need argument with diff (frame shift) for reset
                     player.rect.y = SCREEN_HEIGHT - player.rect.height - 200
+                    player.change_x = 0
+                    player.change_y = 0
+
+            #shoot bulllet
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                bullet = Bullet(pygame.mouse.get_pos(), [player.rect.x, player.rect.y])
+                active_sprite_list.add(bullet)
 
             #only allow key presses if on the ground
             player.rect.y += 2
             platform_hit_list = pygame.sprite.spritecollide(player, player.level.platform_list, False)
             player.rect.y -= 2
-            if (len(platform_hit_list) > 0) and (event.type == pygame.KEYDOWN):
+            if (event.type == pygame.KEYDOWN):
                 if event.key == pygame.K_LEFT or event.key == pygame.K_a:
                     player.go_left()
                 if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
@@ -302,16 +374,11 @@ def main():
                     player.jump()
 
             #stop moving if you stop holding
-            if event.type == pygame.KEYUP and len(platform_hit_list) > 0:
+            if event.type == pygame.KEYUP:
                 if (event.key == pygame.K_LEFT or event.key == pygame.K_a) and player.change_x < 0:
                     player.stop()
                 if (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and player.change_x > 0:
                     player.stop()
-
-            # stop moving if you're coliding with something (ground)
-            # and you're not pressing anything
-            if (len(platform_hit_list) > 0) and (event.type == pygame.KEYUP):
-                player.stop()
 
         # Update the player.
         active_sprite_list.update()
