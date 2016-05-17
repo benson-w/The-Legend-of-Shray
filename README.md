@@ -30,3 +30,4 @@ python3 shray.py
 * acceleration glitch
 * falling glitch
 * unnatural motion
+* image glitch

@@ -66,7 +66,7 @@ class Crosshair(pygame.sprite.Sprite):
     #Crosshair constructor
     def __init__(self):
         super().__init__()
-        self.image = pygame.Surface([5, 5])
+        self.image = pygame.Surface([20, 20])
         self.image.fill(BLACK)
         self.image.set_alpha(100) #0 is fully transparent, #255 opaque
 
@@ -91,9 +91,14 @@ class Player(pygame.sprite.Sprite):
         # This could also be an image loaded from the disk.
         width = 40
         height = 60
+
+        # replace block with test sprite
+        self.image = pygame.image.load("media/shray_standing1.png").convert()
+
+        '''
         self.image = pygame.Surface([width, height])
         self.image.fill(RED)
-
+        '''
         # Set a referance to the image rect.
         self.rect = self.image.get_rect()
 
@@ -178,7 +183,7 @@ class Player(pygame.sprite.Sprite):
     # Player-controlled movement:
     def go_left(self):
         """ Called when the user hits the left arrow. """
-
+        self.image = pygame.image.load("media/shray_left1.png").convert()
         if self.change_x <= -4:
             self.accel_x = 0
             self.change_x = -4
@@ -187,6 +192,7 @@ class Player(pygame.sprite.Sprite):
 
     def go_right(self):
         """ Called when the user hits the right arrow. """
+        self.image = pygame.image.load("media/shray_right1.png").convert()
         if self.change_x >= 4:
             self.accel_x = 0
             self.change_x = 4
@@ -195,6 +201,7 @@ class Player(pygame.sprite.Sprite):
 
     def stop(self):
         """ Called when the user lets off the keyboard. """
+        self.image = pygame.image.load("media/shray_standing1.png").convert()
         self.change_x = 0
         self.accel_x = 0
 
@@ -300,7 +307,7 @@ def main():
 
     # Set the height and width of the screen
     size = [SCREEN_WIDTH, SCREEN_HEIGHT]
-    screen = pygame.display.set_mode(size)
+    screen = pygame.display.set_mode(size, 0, 32)
 
     pygame.display.set_caption("The Legend of Shray")
 
