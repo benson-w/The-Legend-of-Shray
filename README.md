@@ -28,6 +28,5 @@ python3 shray.py
 
 ## Bugs
 * acceleration glitch
-* falling glitch
-* unnatural motion
+* unnatural stopping
 * image glitch

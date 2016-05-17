@@ -92,6 +92,9 @@ class Player(pygame.sprite.Sprite):
         width = 40
         height = 60
 
+        #counts bullets used
+        self.bullet_count = 0
+
         # replace block with test sprite
         self.image = pygame.image.load("media/shray_standing1.png").convert()
 
@@ -149,6 +152,9 @@ class Player(pygame.sprite.Sprite):
             # Stop our vertical movement
             self.change_y = 0
 
+    def get_bullet_count(self):
+        return self.bullet_count
+
     def calc_grav(self):
         """ Calculate effect of gravity. """
         if self.change_y == 0:
@@ -158,8 +164,11 @@ class Player(pygame.sprite.Sprite):
 
         # update position when hit the ground
         if self.rect.y >= SCREEN_HEIGHT - self.rect.height and self.change_y >= 0:
-            self.rect.x = 340
+            self.rect.x = 340 + self.level.world_shift
             self.rect.y = SCREEN_HEIGHT - self.rect.height - 200
+            self.change_x = 0
+            self.change_y = 0
+            self.accel_x = 0
 
         #    self.change_y = 0
         #    self.rect.y = SCREEN_HEIGHT - self.rect.height
@@ -208,7 +217,7 @@ class Player(pygame.sprite.Sprite):
     #health
     def get_percentage(self):
         #update percentage when hit by something
-        self.percentage = 0
+        return self.percentage
 
 
 class Platform(pygame.sprite.Sprite):
@@ -341,7 +350,7 @@ def main():
     clock = pygame.time.Clock()
 
     #initialize text display
-    font = pygame.font.Font('freesansbold.ttf',24)
+    font = pygame.font.Font('freesansbold.ttf', 24)
 
     # -------- Main Program Loop -----------
     while not done:
@@ -366,6 +375,7 @@ def main():
             #shoot bulllet
             if event.type == pygame.MOUSEBUTTONDOWN:
                 bullet = Bullet(pygame.mouse.get_pos(), [player.rect.x, player.rect.y])
+                player.bullet_count = player.bullet_count + 1
                 active_sprite_list.add(bullet)
 
             #only allow key presses if on the ground
@@ -390,10 +400,19 @@ def main():
         # Update the player.
         active_sprite_list.update()
 
-        # Update percentage
-        display_percent = font.render("Percentage: " + str(player.get_percentage()), True, (0, 0, 0))
+
         screen.fill(BLUE)
+
+
+        # Update health, time, bullet text
+        display_percent = font.render("Health: " + str(player.get_percentage()), True, (0, 0, 0))
+        display_time = font.render("Time: " + str(pygame.time.get_ticks()), True, (0, 0, 0))
+        display_bullet_count = font.render("Bullets used: " + str(player.get_bullet_count()), True, (0, 0, 0))
+
+        #display text
         screen.blit(display_percent, (10, 10))
+        screen.blit(display_time, (10, 50))
+        screen.blit(display_bullet_count, (10, 90))
 
         # Update items in the level
         current_level.update()
