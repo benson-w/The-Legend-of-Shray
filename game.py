@@ -182,7 +182,7 @@ def main():
     clock = pygame.time.Clock()
 
     #initialize text display
-    font = pygame.font.Font('freesansbold.ttf',24)
+    font = pygame.font.Font('freesansbold.ttf', 24)
 
     # -------- Main Program Loop -----------
     while not done:
@@ -207,6 +207,7 @@ def main():
             #shoot bulllet
             if event.type == pygame.MOUSEBUTTONDOWN:
                 bullet = Bullet(pygame.mouse.get_pos(), [player.rect.x, player.rect.y])
+                player.bullet_count = player.bullet_count + 1
                 active_sprite_list.add(bullet)
 
             #only allow key presses if on the ground
@@ -231,10 +232,19 @@ def main():
         # Update the player.
         active_sprite_list.update()
 
-        # Update percentage
-        display_percent = font.render("Percentage: " + str(player.get_percentage()), True, (0, 0, 0))
+
         screen.fill(BLUE)
+
+
+        # Update health, time, bullet text
+        display_percent = font.render("Health: " + str(player.get_percentage()), True, (0, 0, 0))
+        display_time = font.render("Time: " + str(pygame.time.get_ticks()), True, (0, 0, 0))
+        display_bullet_count = font.render("Bullets used: " + str(player.get_bullet_count()), True, (0, 0, 0))
+
+        #display text
         screen.blit(display_percent, (10, 10))
+        screen.blit(display_time, (10, 50))
+        screen.blit(display_bullet_count, (10, 90))
 
         # Update items in the level
         current_level.update()

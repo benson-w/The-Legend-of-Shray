@@ -24,12 +24,14 @@ class Player(pygame.sprite.Sprite):
         width = 40
         height = 60
 
+        #counts bullets used
+        self.bullet_count = 0
+
         # replace block with test sprite
-        # First grab sprite size and set player size to such
         self.image = pygame.image.load("media/shray_right.png")
         width = self.image.get_rect().size[0]
         height = self.image.get_rect().size[1]
-        self.image.convert_alpha()
+        self.image = self.image.convert_alpha()
 
         '''
         self.image = pygame.Surface([width, height])
@@ -85,6 +87,9 @@ class Player(pygame.sprite.Sprite):
             # Stop our vertical movement
             self.change_y = 0
 
+    def get_bullet_count(self):
+        return self.bullet_count
+
     def calc_grav(self):
         """ Calculate effect of gravity. """
         if self.change_y == 0:
@@ -94,8 +99,11 @@ class Player(pygame.sprite.Sprite):
 
         # update position when hit the ground
         if self.rect.y >= SCREEN_HEIGHT - self.rect.height and self.change_y >= 0:
-            self.rect.x = 340
+            self.rect.x = 340 + self.level.world_shift
             self.rect.y = SCREEN_HEIGHT - self.rect.height - 200
+            self.change_x = 0
+            self.change_y = 0
+            self.accel_x = 0
 
         #    self.change_y = 0
         #    self.rect.y = SCREEN_HEIGHT - self.rect.height
@@ -144,4 +152,4 @@ class Player(pygame.sprite.Sprite):
     #health
     def get_percentage(self):
         #update percentage when hit by something
-        self.percentage = 100
+        return self.percentage
