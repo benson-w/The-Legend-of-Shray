@@ -15,8 +15,8 @@ import math
 import Modules.player
 from Modules.weapons.bullet import Bullet
 from Modules.player.player import Player
-#from Modules.level.objects import Platform
-from Modules.level.level_one import Level_01
+from Modules.level.objects import Platform
+from Modules.level.level import Level
 
 # Global constants
 '''
@@ -30,6 +30,8 @@ WHITE = (255, 255, 255)
 GREEN = (112, 128, 144)
 RED = (255, 218, 185)
 BLUE = (135, 206, 250)
+
+LEVEL_STRING = 'Modules/level/level_data/level_'
 
 # Screen dimensions
 SCREEN_WIDTH = 800
@@ -58,6 +60,7 @@ def main():
     """ Main Program """
 
     pygame.init()
+    done = False
 
     # Set the height and width of the screen
     size = [SCREEN_WIDTH, SCREEN_HEIGHT]
@@ -75,22 +78,48 @@ def main():
     pygame.mouse.set_visible(False)
 
     # Create all the levels
-    level_list = []
-    level_list.append( Level_01(player) )
+    # Get total list of levels
+    levelListFile = open('Modules/level/level_list.txt')
+    levelList = [x.strip('\n') for x in levelListFile.readlines()]
+
+
 
     # Set the current level
     current_level_no = 0
-    current_level = level_list[current_level_no]
+
+    levelFile = open(LEVEL_STRING + levelList[current_level_no] + '.txt')
+
+    current_level_data = levelFile.readlines()
+    print(current_level_data)
+    for x in range(len(current_level_data)):
+        current_level_data[x] = current_level_data[x].strip('\n')
+        current_level_data[x] = list(current_level_data[x])
+
+    initialLevel = Level(player)
+    initialLevel.level_limit = -1500
+    for y in range(len(current_level_data)):
+        for x in range(len(current_level_data[y])):
+            if current_level_data[y][x] == 'P':
+                block = Platform()
+                block.rect.x = int(x * (SCREEN_WIDTH/len(current_level_data[y])))
+                block.rect.y = int(y * (SCREEN_HEIGHT/len(current_level_data)))
+                initialLevel.platform_list.add(block)
+
+
+    current_level = initialLevel
 
     active_sprite_list = pygame.sprite.Group()
     player.level = current_level
 
+    # Set playe starting point
+    # TODO: Change this to be set by level data
     player.rect.x = 340
     player.rect.y = SCREEN_HEIGHT - player.rect.height - 200
+
+
     active_sprite_list.add(player)
     active_sprite_list.add(crosshair)
 
-    done = False
     # Used to manage how fast the screen updates
     clock = pygame.time.Clock()
 
@@ -151,7 +180,7 @@ def main():
 
         # Update health, time, bullet text
         display_percent = font.render("Health: " + str(player.get_percentage()), True, (0, 0, 0))
-        display_time = font.render("Time: " + str(pygame.time.get_ticks()), True, (0, 0, 0))
+        display_time = font.render("Time: " + str(int(pygame.time.get_ticks()/1000)), True, (0, 0, 0))
         display_bullet_count = font.render("Bullets used: " + str(player.get_bullet_count()), True, (0, 0, 0))
 
         #display text

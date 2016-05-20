@@ -26,7 +26,7 @@ class Level_01(Level):
         self.level_limit = -1500
 
         # Array with width, height, x, and y of platform
-        level = [[600, 40, 100, 500],
+        level = [[600, 40, 300, 500],
                  [600, 40, 700, 480]]
 
         # Go through the array above and add platforms
@@ -34,5 +34,4 @@ class Level_01(Level):
             block = Platform(platform[0], platform[1])
             block.rect.x = platform[2]
             block.rect.y = platform[3]
-            block.player = self.player
             self.platform_list.add(block)
