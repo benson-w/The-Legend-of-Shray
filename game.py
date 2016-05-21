@@ -129,6 +129,27 @@ def main():
     # -------- Main Program Loop -----------
     while not done:
 
+        '''
+        # Below conditional is for shifting the screen further when mouse is on screen
+        if (pygame.mouse.get_pos()[0] - 50) < 1:
+
+            if (player.rect.right < (SCREEN_WIDTH - 50)):
+            # Mouse is left side of screen, we want to shift screen with player in view
+
+                diff = pygame.mouse.get_pos()[0]
+                player.rect.right = player.rect.right + diff
+                current_level.shift_world(diff)
+
+            if (player.rect.left > 50 and player.rect.left ):
+            # Mouse is right side of screen, we want to shift screen with player in view
+
+                diff = pygame.mouse.get_pos()[0] - SCREEN_WIDTH - 50
+                player.rect.left = player.rect.left - diff
+                current_level.shift_world(-diff)
+        '''
+
+
+
         #Update crosshair position (Crosshair.update is broken; not sure what arguments to pass)
         crosshair.rect.x = pygame.mouse.get_pos()[0]
         crosshair.rect.y = pygame.mouse.get_pos()[1]
@@ -140,7 +161,7 @@ def main():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE: #exit the game
                     done = True
-                if event.key == pygame.K_1:
+                if event.key == pygame.K_TAB:
                     player.rect.x = 340 + player.level.world_shift #need argument with diff (frame shift) for reset
                     player.rect.y = SCREEN_HEIGHT - player.rect.height - 200
                     player.change_x = 0
@@ -148,14 +169,11 @@ def main():
 
             #shoot bulllet
             if event.type == pygame.MOUSEBUTTONDOWN:
-                bullet = Bullet(pygame.mouse.get_pos(), [player.rect.x, player.rect.y])
-                player.bullet_count = player.bullet_count + 1
-                active_sprite_list.add(bullet)
+                if player.toggle_gun == True:
+                    bullet = Bullet(pygame.mouse.get_pos(), [player.rect.x, player.rect.y], player.toggle_gun)
+                    player.bullet_count = player.bullet_count - 1
+                    active_sprite_list.add(bullet)
 
-            #only allow key presses if on the ground
-            player.rect.y += 2
-            platform_hit_list = pygame.sprite.spritecollide(player, player.level.platform_list, False)
-            player.rect.y -= 2
             if (event.type == pygame.KEYDOWN):
                 if event.key == pygame.K_LEFT or event.key == pygame.K_a:
                     player.go_left()
@@ -163,6 +181,14 @@ def main():
                     player.go_right()
                 if event.key == pygame.K_UP or event.key == pygame.K_w:
                     player.jump()
+                if event.key == pygame.K_r and player.toggle_gun == True:
+                    player.bullet_count = 50
+                if event.key == pygame.K_1:
+                    player.toggle_gun = True
+
+            player.rect.y += 2
+            platform_hit_list = pygame.sprite.spritecollide(player, player.level.platform_list, False)
+            player.rect.y -= 2
 
             #stop moving if you stop holding
             if event.type == pygame.KEYUP:
@@ -171,9 +197,16 @@ def main():
                 if (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and player.change_x > 0:
                     player.stop()
 
-        # Update the player.
-        active_sprite_list.update()
+            '''
+            if (pygame.key.get_pressed() == (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)):
+                if (event.key == pygame.K_LEFT or event.key == pygame.K_a) and player.change_x < 0:
+                    player.stop()
+                if (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and player.change_x > 0:
+                    player.stop()
+            '''
 
+        # Update everthing in sprite_list defined by super().__init__
+        active_sprite_list.update()
 
         screen.fill(BLUE)
 
@@ -181,12 +214,19 @@ def main():
         # Update health, time, bullet text
         display_percent = font.render("Health: " + str(player.get_percentage()), True, (0, 0, 0))
         display_time = font.render("Time: " + str(int(pygame.time.get_ticks()/1000)), True, (0, 0, 0))
-        display_bullet_count = font.render("Bullets used: " + str(player.get_bullet_count()), True, (0, 0, 0))
+        display_bullet_count = font.render("Magazine: " + str(player.get_bullet_count()), True, (0, 0, 0))
 
         #display text
         screen.blit(display_percent, (10, 10))
         screen.blit(display_time, (10, 50))
         screen.blit(display_bullet_count, (10, 90))
+
+        # bullet collision
+        '''
+        for platform in player.level.platform_list:
+            if bullet.rect.colliderect(platform.rect):
+                active_sprite_list.remove(bullet)
+        '''
 
         # Update items in the level
         current_level.update()

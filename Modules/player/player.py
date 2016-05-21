@@ -24,8 +24,10 @@ class Player(pygame.sprite.Sprite):
         width = 40
         height = 60
 
-        #counts bullets used
-        self.bullet_count = 0
+        self.toggle_gun = False
+
+        #counts bullets used, magazine size
+        self.bullet_count = 50
 
         # replace block with test sprite
         self.image = pygame.image.load("media/shray_right.png")
@@ -67,9 +69,11 @@ class Player(pygame.sprite.Sprite):
             # set our right side to the left side of the item we hit
             if self.change_x > 0:
                 self.rect.right = block.rect.left
+                self.accel_x = 0
             elif self.change_x < 0:
                 # Otherwise if we are moving left, do the opposite.
                 self.rect.left = block.rect.right
+                self.accel_x = 0
 
         # Move up/down
         self.rect.y += self.change_y
@@ -118,7 +122,7 @@ class Player(pygame.sprite.Sprite):
         platform_hit_list = pygame.sprite.spritecollide(self, self.level.platform_list, False)
         self.rect.y -= 2
 
-        self.accel_x = 0 #unsure about this line
+        self.accel_x = 0
 
         # If it is ok to jump, set our speed upwards
         if len(platform_hit_list) > 0 or self.rect.bottom >= SCREEN_HEIGHT:
@@ -128,24 +132,25 @@ class Player(pygame.sprite.Sprite):
     def go_left(self):
         """ Called when the user hits the left arrow. """
         self.image = pygame.image.load("media/shray_left.png").convert_alpha()
+
         if self.change_x <= -4:
-            self.accel_x = 0
             self.change_x = -4
+            self.accel_x = 0
         else:
-            self.accel_x = -1
+            self.accel_x = self.accel_x - .5
 
     def go_right(self):
         """ Called when the user hits the right arrow. """
         self.image = pygame.image.load("media/shray_right.png").convert_alpha()
         if self.change_x >= 4:
             self.accel_x = 0
-            self.change_x = 4
         else:
-            self.accel_x = 1
+            self.accel_x = self.accel_x + .5
 
     def stop(self):
         """ Called when the user lets off the keyboard. """
         #self.image = pygame.image.load("media/shray_standing1.png").convert()
+
         self.change_x = 0
         self.accel_x = 0
 

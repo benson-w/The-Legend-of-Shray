@@ -1,5 +1,8 @@
 import pygame
 import math
+import Modules.player
+from Modules.level.objects import Platform
+from Modules.level.level import Level
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -9,18 +12,19 @@ BLUE = (135, 206, 250)
 
 class Bullet(pygame.sprite.Sprite):
 
-    def __init__(self, mouse, player):
-        super().__init__()
-        self.image = pygame.Surface([10, 10])
-        self.image.fill(BLACK)
+    def __init__(self, mouse, player, toggle):
+        if toggle == True:
+            super().__init__()
+            self.image = pygame.Surface([10, 10])
+            self.image.fill(BLACK)
 
-        self.mouse_x, self.mouse_y = mouse[0], mouse[1]
-        self.player = player
+            self.mouse_x, self.mouse_y = mouse[0], mouse[1]
+            self.player = player
 
-        self.rect = self.image.get_rect()
+            self.rect = self.image.get_rect()
 
-        self.rect.x = player[0]
-        self.rect.y = player[1]
+            self.rect.x = player[0]
+            self.rect.y = player[1]
 
     def update(self):
 
@@ -35,4 +39,4 @@ class Bullet(pygame.sprite.Sprite):
         self.rect.x += bullet_vector[0]
         self.rect.y += bullet_vector[1]
 
-        #TODO: destroy upon collision or exceed range
+        #platform_hit_list = pygame.sprite.spritecollide(self, player.level.platform_list, True)

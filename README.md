@@ -14,7 +14,8 @@ python3 shray.py
 ## Controls
 * WASD for movement (or arrow keys)
 * esc to exit game
-* 1 to respawn
+* TAB to respawn
+* 1 to toggle gun
 * mouse to shoot
 
 ## Still To Do
@@ -24,9 +25,7 @@ python3 shray.py
 * add items
 * add player functionality, weapons, etc
 * add bullet collision
-* add slight lateral movement in air
 
 ## Bugs
-* acceleration glitch
 * unnatural stopping
 * image glitch
