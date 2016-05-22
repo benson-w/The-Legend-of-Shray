@@ -15,8 +15,11 @@ python3 shray.py
 * WASD for movement (or arrow keys)
 * esc to exit game
 * TAB to respawn
-* 1 to toggle gun
+* 1 to toggle gun, 2 3 4 for other weapons
+* r to reload
 * mouse to shoot
+
+
 
 ## Still To Do
 * animations

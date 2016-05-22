@@ -11,7 +11,7 @@ BLUE = (135, 206, 250)
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
-class Player(pygame.sprite.Sprite):
+class Enemy(pygame.sprite.Sprite):
 
     def __init__(self):
         """ Constructor function """
@@ -19,42 +19,20 @@ class Player(pygame.sprite.Sprite):
         # Call the parent's constructor
         super().__init__()
 
-        # Create an image of the block, and fill it with a color.
-        # This could also be an image loaded from the disk.
-        width = 40
-        height = 60
-
-        self.toggle_gun = False
-        self.bullet_count = 50
-
-        self.on_ground = True
-
-        # replace block with test sprite
-        self.image = pygame.image.load("media/shray_right.png")
-        width = self.image.get_rect().size[0]
-        height = self.image.get_rect().size[1]
-        self.image = self.image.convert_alpha()
-
-        '''
+        #give size, image attributes
+        width = 100
+        height = 100
         self.image = pygame.Surface([width, height])
         self.image.fill(RED)
-        '''
-        # Set a referance to the image rect.
-        self.rect = self.image.get_rect()
 
-        # Set speed vector of player
-        self.change_x = 0
-        self.change_y = 0
-        self.accel_x = 0
-
-        # Set initial health/percentage
-        self.percentage = 100
+        # add a health
+        self.percentage = 0
 
         # List of sprites we can bump against
         self.level = None
 
     def update(self):
-        """ Move the player. """
+        """ Enemy movement """
         # Gravity
         self.calc_grav()
 

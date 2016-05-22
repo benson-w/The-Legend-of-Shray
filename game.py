@@ -189,8 +189,16 @@ def main():
                     player.jump()
                 if event.key == pygame.K_r and player.toggle_gun == True:
                     player.bullet_count = 50
-                if event.key == pygame.K_1:
+                if event.key == pygame.K_1:     #weapon 1
                     player.toggle_gun = True
+                if event.key == pygame.K_2:     #weapon 2
+                    player.toggle_gun = False
+                if event.key == pygame.K_3:     #weapon 3
+                    player.toggle_gun = False
+                if event.key == pygame.K_4:     #weapon 4
+                    player.toggle_gun = False
+
+
 
             player.rect.y += 2
             platform_hit_list = pygame.sprite.spritecollide(player, player.level.platform_list, False)
@@ -222,12 +230,15 @@ def main():
         # Update health, time, bullet text
         display_percent = font.render("Health: " + str(player.get_percentage()), True, (0, 0, 0))
         display_time = font.render("Time: " + str(int(pygame.time.get_ticks()/1000)), True, (0, 0, 0))
-        display_bullet_count = font.render("Magazine: " + str(player.get_bullet_count()), True, (0, 0, 0))
+        if player.toggle_gun == True:
+            display_weapon_text = font.render("Magazine: " + str(player.get_bullet_count()), True, (0, 0, 0))
+        else:
+            display_weapon_text = font.render("Melee Mode", True, (0, 0, 0))
 
         #display text
         screen.blit(display_percent, (10, 10))
         screen.blit(display_time, (10, 50))
-        screen.blit(display_bullet_count, (10, 90))
+        screen.blit(display_weapon_text, (10, 90))
 
         # bullet collision with walls
         for bullet in bullet_list:
