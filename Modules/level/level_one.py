@@ -9,13 +9,11 @@ GREEN = (112, 128, 144)
 RED = (255, 218, 185)
 BLUE = (135, 206, 250)
 
-# Screen dimensions
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
 # Create platforms for the level
 class Level_01(Level):
-    """ Definition for level 1. """
 
     def __init__(self, player):
         """ Create level 1. """

@@ -17,31 +17,22 @@ class Enemy1(pygame.sprite.Sprite):
 
     def __init__(self):
 
-        # Call the parent's constructor
-        # Enemy.__init__(self), jk there's nothing to call, maybe once we figure enemies out
         super().__init__()
 
+        #give size, image attributes, and other traits
         self.percentage = 100
-
-        #give size, image attributes
         width = 75
         height = 75
         self.image = pygame.Surface([width, height])
         self.image.fill(RED)
         self.rect = self.image.get_rect()
-
-        #location
         self.rect.x = 400
         self.rect.y = 200
-
-        # want to make actions contained so game.py isn't huger than it already is >_<
 
         #simple movement toggle
         self.toggle_movement = False
 
     def update(self):
-
-        #simple movement, lmao it's not workign but honestly, FUCK it
 
         if self.rect.x < 200:
             self.toggle_movement == False
