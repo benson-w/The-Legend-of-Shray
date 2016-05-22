@@ -17,14 +17,11 @@ from Modules.weapons.bullet import Bullet
 from Modules.player.player import Player
 from Modules.level.objects import Platform
 from Modules.level.level import Level
+from Modules.enemies.enemies import Enemy
+from Modules.enemies.enemy1 import Enemy1
 
-# Global constants
-'''
+
 #doesn't match to actual colors
-Red is color of character
-Blue is color of background
-Green is color of blocks
-'''
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GREEN = (112, 128, 144)
@@ -90,7 +87,7 @@ def main():
     levelFile = open(LEVEL_STRING + levelList[current_level_no] + '.txt')
 
     current_level_data = levelFile.readlines()
-    print(current_level_data)
+    #print(current_level_data)
     for x in range(len(current_level_data)):
         current_level_data[x] = current_level_data[x].strip('\n')
         current_level_data[x] = list(current_level_data[x])
@@ -114,8 +111,21 @@ def main():
     #group for Bullets
     bullet_list = pygame.sprite.Group()
 
-
     player.level = current_level
+
+    # sprite list contain enemy objects for specific level
+    enemy_list = pygame.sprite.Group()
+
+
+    # delete all the enemies before adding the new one for the level
+    for enemy in enemy_list:
+        enemy_list.remove(enemy)
+
+    # populate the right enemy for the level, use enemy_list to handle
+    if player.level == initialLevel:
+        enemy = Enemy1()
+        enemy_list.add(enemy)
+    # elif level == level 2, etc
 
     # Set playe starting point
     # TODO: Change this to be set by level data
@@ -145,14 +155,14 @@ def main():
 
                 diff = pygame.mouse.get_pos()[0]
                 player.rect.right = player.rect.right + diff
-                current_level.shift_world(diff)
+                current_level.shift_world(diff, enemy)
 
             if (player.rect.left > 50 and player.rect.left ):
             # Mouse is right side of screen, we want to shift screen with player in view
 
                 diff = pygame.mouse.get_pos()[0] - SCREEN_WIDTH - 50
                 player.rect.left = player.rect.left - diff
-                current_level.shift_world(-diff)
+                current_level.shift_world(-diff, enemy)
 
 
         #Update crosshair position (Crosshair.update is broken; not sure what arguments to pass)
@@ -198,8 +208,6 @@ def main():
                 if event.key == pygame.K_4:     #weapon 4
                     player.toggle_gun = False
 
-
-
             player.rect.y += 2
             platform_hit_list = pygame.sprite.spritecollide(player, player.level.platform_list, False)
             player.rect.y -= 2
@@ -219,15 +227,14 @@ def main():
                     player.stop()
 
 
-
         # Update everthing in sprite_list defined by super().__init__
         active_sprite_list.update()
         bullet_list.update()
+        enemy_list.update()
 
-        screen.fill(BLUE)
+        screen.fill(BLUE) #fill background maybe with a picture later
 
-
-        # Update health, time, bullet text
+        # Update health, time, bullet text, enemy health
         display_percent = font.render("Health: " + str(player.get_percentage()), True, (0, 0, 0))
         display_time = font.render("Time: " + str(int(pygame.time.get_ticks()/1000)), True, (0, 0, 0))
         if player.toggle_gun == True:
@@ -235,10 +242,26 @@ def main():
         else:
             display_weapon_text = font.render("Melee Mode", True, (0, 0, 0))
 
+        display_enemy_percent = font.render("Enemy hp: " + str(enemy.percentage), True, (0, 0, 0))
+
         #display text
         screen.blit(display_percent, (10, 10))
         screen.blit(display_time, (10, 50))
         screen.blit(display_weapon_text, (10, 90))
+        screen.blit(display_enemy_percent, (10, 130))
+
+        # bullet collision with enemies
+        for bullet in bullet_list:
+            for enemy in enemy_list:
+                if bullet.rect.colliderect(enemy.rect):
+                    bullet_list.remove(bullet)
+                    #print(enemy_list)
+                    if enemy.percentage <= 0:
+                        enemy_list.remove(enemy)
+                        enemy.percentage = 0
+                    if (enemy.percentage > 0):
+                        enemy.percentage = enemy.percentage - 10
+
 
         # bullet collision with walls
         for bullet in bullet_list:
@@ -253,25 +276,22 @@ def main():
         if player.rect.right >= 500:
             diff = player.rect.right - 500
             player.rect.right = 500
-            current_level.shift_world(-diff)
+            current_level.shift_world(-diff, enemy)
 
         # If the player gets near the left side, shift the world right (+x)
         if player.rect.left <= 120:
             diff = 120 - player.rect.left
             player.rect.left = 120
-            current_level.shift_world(diff)
+            current_level.shift_world(diff, enemy)
 
-
-        ''' Code for end of level
-         http://programarcadegames.com/python_examples/show_file.php?file=platform_moving.py
-         around line 425
-         '''
+        # Code for end of level, line 425: http://programarcadegames.com/python_examples/show_file.php?file=platform_moving.py
 
         # ALL CODE TO DRAW SHOULD GO BELOW THIS COMMENT
 
         current_level.draw(screen)
-        active_sprite_list.draw(screen)
         bullet_list.draw(screen)
+        enemy_list.draw(screen)
+        active_sprite_list.draw(screen)
 
         # ALL CODE TO DRAW SHOULD GO ABOVE THIS COMMENT
         # Limit to 60 frames per second

@@ -19,11 +19,9 @@ python3 shray.py
 * r to reload
 * mouse to shoot
 
-
-
 ## Still To Do
 * animations
-* add enemies
+* make enemy better
 * add visuals
 * add items
 * add player functionality, weapons, etc

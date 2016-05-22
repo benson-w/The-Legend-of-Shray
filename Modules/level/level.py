@@ -45,7 +45,7 @@ class Level(object):
         self.platform_list.draw(screen)
         self.enemy_list.draw(screen)
 
-    def shift_world(self, shift_x):
+    def shift_world(self, shift_x, enemy):
         """ When the user moves left/right and we need to scroll everything:"""
 
         # Keep track of the shift amount
@@ -55,5 +55,4 @@ class Level(object):
         for platform in self.platform_list:
             platform.rect.x += shift_x
 
-        for enemy in self.enemy_list:
-            enemy.rect.x += shift_x
+        enemy.rect.x += shift_x
