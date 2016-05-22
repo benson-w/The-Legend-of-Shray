@@ -25,9 +25,9 @@ class Player(pygame.sprite.Sprite):
         height = 60
 
         self.toggle_gun = False
-
-        #counts bullets used, magazine size
         self.bullet_count = 50
+
+        self.on_ground = True
 
         # replace block with test sprite
         self.image = pygame.image.load("media/shray_right.png")

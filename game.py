@@ -108,7 +108,13 @@ def main():
 
     current_level = initialLevel
 
+    #group for almost everything that doesn't need independent handling
     active_sprite_list = pygame.sprite.Group()
+
+    #group for Bullets
+    bullet_list = pygame.sprite.Group()
+
+
     player.level = current_level
 
     # Set playe starting point
@@ -129,8 +135,9 @@ def main():
     # -------- Main Program Loop -----------
     while not done:
 
-        '''
-        # Below conditional is for shifting the screen further when mouse is on screen
+        # Use mouse to look beyond the scope of the screen
+        # The below conditional doesn't work as anticipated
+
         if (pygame.mouse.get_pos()[0] - 50) < 1:
 
             if (player.rect.right < (SCREEN_WIDTH - 50)):
@@ -146,8 +153,6 @@ def main():
                 diff = pygame.mouse.get_pos()[0] - SCREEN_WIDTH - 50
                 player.rect.left = player.rect.left - diff
                 current_level.shift_world(-diff)
-        '''
-
 
 
         #Update crosshair position (Crosshair.update is broken; not sure what arguments to pass)
@@ -167,12 +172,13 @@ def main():
                     player.change_x = 0
                     player.change_y = 0
 
-            #shoot bulllet
+            #shoot bullet
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if player.toggle_gun == True:
                     bullet = Bullet(pygame.mouse.get_pos(), [player.rect.x, player.rect.y], player.toggle_gun)
                     player.bullet_count = player.bullet_count - 1
-                    active_sprite_list.add(bullet)
+                    #active_sprite_list.add(bullet)
+                    bullet_list.add(bullet)
 
             if (event.type == pygame.KEYDOWN):
                 if event.key == pygame.K_LEFT or event.key == pygame.K_a:
@@ -190,6 +196,13 @@ def main():
             platform_hit_list = pygame.sprite.spritecollide(player, player.level.platform_list, False)
             player.rect.y -= 2
 
+            ''' doens't work fuck me, i already tried praying to heavenly divine based zuofu so basically gg fml
+            if (len(platform_hit_list) > 0):
+                player.on_ground = True
+            elif (len(platform_hit_list) == 0 and player.change_y != 0) :
+                player.on_ground = False
+            '''
+
             #stop moving if you stop holding
             if event.type == pygame.KEYUP:
                 if (event.key == pygame.K_LEFT or event.key == pygame.K_a) and player.change_x < 0:
@@ -197,16 +210,11 @@ def main():
                 if (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and player.change_x > 0:
                     player.stop()
 
-            '''
-            if (pygame.key.get_pressed() == (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)):
-                if (event.key == pygame.K_LEFT or event.key == pygame.K_a) and player.change_x < 0:
-                    player.stop()
-                if (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and player.change_x > 0:
-                    player.stop()
-            '''
+
 
         # Update everthing in sprite_list defined by super().__init__
         active_sprite_list.update()
+        bullet_list.update()
 
         screen.fill(BLUE)
 
@@ -221,12 +229,11 @@ def main():
         screen.blit(display_time, (10, 50))
         screen.blit(display_bullet_count, (10, 90))
 
-        # bullet collision
-        '''
-        for platform in player.level.platform_list:
-            if bullet.rect.colliderect(platform.rect):
-                active_sprite_list.remove(bullet)
-        '''
+        # bullet collision with walls
+        for bullet in bullet_list:
+            for platform in player.level.platform_list:
+                if bullet.rect.colliderect(platform.rect):
+                    bullet_list.remove(bullet)
 
         # Update items in the level
         current_level.update()
@@ -253,6 +260,7 @@ def main():
 
         current_level.draw(screen)
         active_sprite_list.draw(screen)
+        bullet_list.draw(screen)
 
         # ALL CODE TO DRAW SHOULD GO ABOVE THIS COMMENT
         # Limit to 60 frames per second
