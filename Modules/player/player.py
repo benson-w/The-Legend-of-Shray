@@ -99,18 +99,20 @@ class Player(pygame.sprite.Sprite):
 
     def go_left(self):
         self.image = pygame.image.load("media/shray_left.png").convert_alpha()
-        if self.change_x <= -4:
-            self.change_x = -4
-            self.accel_x = 0
-        else:
-            self.accel_x = self.accel_x - .5
+        self.change_x = -4
+        # if self.change_x <= -4:
+        #     self.change_x = -4
+        #     self.accel_x = 0
+        # else:
+        #     self.accel_x = self.accel_x - .5
 
     def go_right(self):
         self.image = pygame.image.load("media/shray_right.png").convert_alpha()
-        if self.change_x >= 4:
-            self.accel_x = 0
-        else:
-            self.accel_x = self.accel_x + .5
+        self.change_x = 4
+        # if self.change_x >= 4:
+        #     self.accel_x = 0
+        # else:
+        #     self.accel_x = self.accel_x + .5
 
     def stop(self):
         #self.image = pygame.image.load("media/shray_standing1.png").convert()
